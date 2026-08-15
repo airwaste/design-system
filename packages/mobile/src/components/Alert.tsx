@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, ViewStyle, TextStyle } from 'react-native';
-import { toneForStatus, type Tone } from '@airwaste/design-tokens';
+import { toneForStatus, type Tone } from '../tokens';
 import { toneColor } from '../theme';
 
 export interface AlertProps {

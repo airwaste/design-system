@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ViewStyle } from 'react-native';
-import { spacing } from '@airwaste/design-tokens';
+import { spacing } from '../tokens';
 
 export interface StackProps {
   direction?: 'row' | 'column';

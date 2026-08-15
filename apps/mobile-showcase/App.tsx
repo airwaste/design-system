@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, View, StyleSheet } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { ScrollView, Text, View, StyleSheet, StatusBar } from 'react-native';
 import {
   Button,
   Card,
@@ -34,7 +33,6 @@ export default function App() {
 
   return (
     <View style={styles.screen}>
-      <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.titleRow}>
           <Logo variant="icon" size={40} />

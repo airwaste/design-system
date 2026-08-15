@@ -1,5 +1,6 @@
 {
   "expo": {
+    "owner": "airwaste",
     "name": "AirWaste Design System (Mobile)",
     "slug": "airwaste-design-system-mobile",
     "version": "0.1.0",
@@ -20,6 +21,10 @@
     "web": {
       "bundler": "metro"
     },
-    "plugins": ["expo-status-bar"]
+    "extra": {
+      "eas": {
+        "projectId": "0e056ef7-1c49-44c8-970d-fff43245cac5"
+      }
+    }
   }
 }

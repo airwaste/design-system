@@ -1,4 +1,4 @@
-import { colors, spacing, radii, shadows, typography, type Tone } from '@airwaste/design-tokens';
+import { colors, spacing, radii, shadows, typography, type Tone } from './tokens';
 
 // React Native theme object derived from the shared brand tokens.
 // Consumed by the Expo client + collector apps.
