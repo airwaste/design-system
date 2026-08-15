@@ -1,0 +1,83 @@
+# ============================================================================
+# AirWaste — build the mobile showcase on EAS and refresh the QR on Pages.
+#
+# Triggers on pushes that touch the mobile design system (not the web gallery):
+#   - apps/mobile-showcase/**
+#   - packages/mobile/**
+#   - packages/tokens/**
+#   - this workflow file
+#
+# Flow: install deps (GHCR via GITHUB_TOKEN) -> `eas build` (preview APK) ->
+# wait for completion -> update the EXPO_PREVIEW_URL repo variable, which the
+# Pages site reads as VITE_EXPO_URL to render the scannable QR.
+# ============================================================================
+name: eas-mobile-build
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'apps/mobile-showcase/**'
+      - 'packages/mobile/**'
+      - 'packages/tokens/**'
+      - '.github/workflows/eas-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@airwaste"
+
+      - name: Install mobile showcase deps
+        working-directory: apps/mobile-showcase
+        run: npm install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger EAS preview build
+        id: eas
+        working-directory: apps/mobile-showcase
+        run: |
+          BUILD_ID=$(npx eas build --platform android --profile preview \
+            --non-interactive --no-wait --json \
+            | python3 -c "import sys,json;print(json.load(sys.stdin)['id'])")
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for build to finish
+        id: wait
+        working-directory: apps/mobile-showcase
+        run: |
+          BUILD_ID="${{ steps.eas.outputs.build_id }}"
+          for i in $(seq 1 60); do
+            STATUS=$(npx eas build:view "$BUILD_ID" --json \
+              | python3 -c "import sys,json;print(json.load(sys.stdin)['status'])")
+            if [ "$STATUS" = "finished" ] || [ "$STATUS" = "errored" ] || [ "$STATUS" = "canceled" ]; then
+              echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+              break
+            fi
+            sleep 15
+          done
+
+      - name: Update EXPO_PREVIEW_URL repo variable
+        if: steps.wait.outputs.status == 'finished'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BUILD_ID="${{ steps.eas.outputs.build_id }}"
+          URL="https://expo.dev/accounts/airwaste/projects/airwaste-design-system-mobile/builds/$BUILD_ID"
+          gh variable set EXPO_PREVIEW_URL --repo "$GITHUB_REPOSITORY" --body "$URL"
