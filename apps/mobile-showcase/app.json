@@ -8,6 +8,10 @@
     "scheme": "airwaste-ds",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
+    "splash": {
+      "backgroundColor": "#15803D",
+      "resizeMode": "contain"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "io.airwaste.designsystem.mobile"
