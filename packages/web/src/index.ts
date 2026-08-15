@@ -15,5 +15,6 @@ export * from './components/Stack';
 export * from './components/Alert';
 export * from './components/Modal';
 export * from './components/Logo';
+export * from './components/DataTable';
 export { airwastePreset } from './tailwind-preset';
 export { default as airwastePresetDefault } from './tailwind-preset';
