@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="AirWaste icon">
+  <defs>
+    <linearGradient id="bodyGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4ADE80"/>
+      <stop offset="45%" stop-color="#22C55E"/>
+      <stop offset="100%" stop-color="#15803D"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Soft ground shadow -->
+  <ellipse cx="256" cy="436" rx="112" ry="12" fill="#15803D" opacity="0.18"/>
+
+  <!-- Lid handle -->
+  <rect x="232" y="84" width="48" height="16" rx="8" fill="#4ADE80"/>
+
+  <!-- Lid -->
+  <rect x="146" y="100" width="220" height="34" rx="16" fill="#15803D"/>
+
+  <!-- Bin body (rounded, tapered) -->
+  <path fill="url(#bodyGreen)" d="
+    M 160 158
+    L 178 400
+    Q 181 418 199 418
+    L 313 418
+    Q 331 418 334 400
+    L 352 158
+    Q 352 146 340 146
+    L 172 146
+    Q 160 146 160 158
+    Z"/>
+
+  <!-- Gloss highlight -->
+  <rect x="174" y="168" width="16" height="226" rx="8" fill="#FFFFFF" opacity="0.22"/>
+
+  <!-- Recycle symbol (white, modern rounded arrows) -->
+  <g fill="#FFFFFF" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Arrow tails -->
+    <path d="M 275 262.9 L 305 314.9" fill="none"/>
+    <path d="M 280.4 338 L 220.4 338" fill="none"/>
+    <path d="M 212.6 305.1 L 242.6 253.1" fill="none"/>
+
+    <!-- Arrowheads -->
+    <path d="M 304 338 L 320 328 L 320 348 Z" fill="#FFFFFF" stroke="none"/>
+    <path d="M 199.6 327.6 L 201.9 341.6 L 186.3 332.6 Z" fill="#FFFFFF" stroke="none"/>
+    <path d="M 262 240.4 L 264.3 226.4 L 248.7 235.4 Z" fill="#FFFFFF" stroke="none"/>
+  </g>
+</svg>
