@@ -1,5 +1,5 @@
 import React from 'react';
-import { spacing } from '@airwaste/design-tokens';
+import { spacing } from '../spacing';
 
 export interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
   direction?: 'row' | 'column';

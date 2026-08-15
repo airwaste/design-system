@@ -1,5 +1,5 @@
 import React from 'react';
-import { toneForStatus, type Tone } from '@airwaste/design-tokens';
+import { toneForStatus, type Tone } from '../tone';
 
 export interface StatusPillProps extends React.HTMLAttributes<HTMLSpanElement> {
   // A backend status string (UserStatus, OrderStatus, ...). Display label

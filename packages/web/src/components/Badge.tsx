@@ -1,5 +1,5 @@
 import React from 'react';
-import { toneForStatus, type Tone } from '@airwaste/design-tokens';
+import { toneForStatus, type Tone } from '../tone';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   tone?: Tone;
