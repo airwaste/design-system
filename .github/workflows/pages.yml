@@ -48,6 +48,10 @@ jobs:
       - name: Build showcase
         working-directory: apps/showcase
         run: npm run build
+        env:
+          # Optional: when set, the Mobile page renders a scannable QR
+          # pointing at the Expo preview build / dev tunnel.
+          VITE_EXPO_URL: ${{ vars.EXPO_PREVIEW_URL }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
