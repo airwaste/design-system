@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "AirWaste Design System (Mobile)",
+    "slug": "airwaste-design-system-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "airwaste-ds",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "io.airwaste.designsystem.mobile"
+    },
+    "android": {
+      "package": "io.airwaste.designsystem.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#15803D"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": ["expo-status-bar"]
+  }
+}

@@ -9,7 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@airwaste/design-system-web": "^0.1.1",
+    "@airwaste/design-system-web": "^0.1.2",
+    "qrcode.react": "^3.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
