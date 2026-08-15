@@ -8,8 +8,10 @@
 #   - this workflow file
 #
 # Flow: install deps (GHCR via GITHUB_TOKEN) -> `eas build` (preview APK) ->
-# wait for completion -> update the EXPO_PREVIEW_URL repo variable, which the
-# Pages site reads as VITE_EXPO_URL to render the scannable QR.
+# wait for completion -> dispatch the Pages deploy, passing the build URL as
+# the expo_url input. The Pages build embeds it as VITE_EXPO_URL so the Mobile
+# page renders a scannable QR. (We dispatch Pages directly instead of writing a
+# repo variable, because the workflow token can't manage repo variables here.)
 # ============================================================================
 name: eas-mobile-build
 
@@ -74,11 +76,12 @@ jobs:
             sleep 15
           done
 
-      - name: Update EXPO_PREVIEW_URL repo variable
+      - name: Deploy Pages with new QR URL
         if: steps.wait.outputs.status == 'FINISHED'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BUILD_ID="${{ steps.eas.outputs.build_id }}"
           URL="https://expo.dev/accounts/airwaste/projects/airwaste-design-system-mobile/builds/$BUILD_ID"
-          gh variable set EXPO_PREVIEW_URL --repo "$GITHUB_REPOSITORY" --body "$URL"
+          gh workflow run deploy-pages --repo "$GITHUB_REPOSITORY" \
+            --field expo_url="$URL"
