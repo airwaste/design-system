@@ -66,7 +66,7 @@ jobs:
           for i in $(seq 1 60); do
             STATUS=$(npx eas build:view "$BUILD_ID" --json \
               | python3 -c "import sys,json;print(json.load(sys.stdin)['status'])")
-            if [ "$STATUS" = "finished" ] || [ "$STATUS" = "errored" ] || [ "$STATUS" = "canceled" ]; then
+            if [ "$STATUS" = "FINISHED" ] || [ "$STATUS" = "ERRORED" ] || [ "$STATUS" = "CANCELED" ]; then
               echo "status=$STATUS" >> "$GITHUB_OUTPUT"
               break
             fi
@@ -74,7 +74,7 @@ jobs:
           done
 
       - name: Update EXPO_PREVIEW_URL repo variable
-        if: steps.wait.outputs.status == 'finished'
+        if: steps.wait.outputs.status == 'FINISHED'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
