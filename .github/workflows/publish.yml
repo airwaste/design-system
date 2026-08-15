@@ -48,6 +48,7 @@ jobs:
       - name: Sync package versions
         run: |
           npm version "${{ steps.version.outputs.VERSION }}" \
+            --allow-same-version --no-git-tag-version \
             -w @airwaste/design-system-web \
             -w @airwaste/design-system-mobile
 
