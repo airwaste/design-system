@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, TextInput, View, ViewStyle, TextStyle } from 'react-native';
-import { theme } from '../theme';
+import { Text, TextInput, View } from 'react-native';
+import { cn } from '../lib/utils';
 
 export interface InputProps {
   label?: string;
@@ -11,48 +11,36 @@ export interface InputProps {
   placeholder?: string;
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
-  style?: ViewStyle;
-  inputStyle?: TextStyle;
+  style?: object;
+  inputStyle?: object;
+  inputClassName?: string;
 }
 
-export const Input: React.FC<InputProps> = ({
-  label,
-  error,
-  hint,
-  value,
-  onChangeText,
-  placeholder,
-  secureTextEntry,
-  keyboardType = 'default',
-  style,
-  inputStyle,
-}) => (
-  <View style={[{ gap: 4 }, style]}>
-    {label && <Text style={{ fontSize: 13, fontWeight: '500', color: theme.colors.neutral[700] }}>{label}</Text>}
-    <TextInput
-      value={value}
-      onChangeText={onChangeText}
-      placeholder={placeholder}
-      secureTextEntry={secureTextEntry}
-      keyboardType={keyboardType}
-      style={[
-        {
-          borderWidth: 1,
-          borderColor: error ? theme.colors.status.error : theme.colors.neutral[300],
-          borderRadius: theme.radii.md,
-          paddingVertical: 10,
-          paddingHorizontal: 12,
-          fontSize: 14,
-          color: theme.colors.neutral[900],
-          backgroundColor: theme.colors.brand.white,
-        },
-        inputStyle,
-      ]}
-    />
-    {error ? (
-      <Text style={{ fontSize: 11, color: theme.colors.status.error }}>{error}</Text>
-    ) : hint ? (
-      <Text style={{ fontSize: 11, color: theme.colors.neutral[500] }}>{hint}</Text>
-    ) : null}
-  </View>
+export const Input = React.forwardRef<TextInput, InputProps>(
+  ({ label, error, hint, value, onChangeText, placeholder, secureTextEntry, keyboardType = 'default', style, inputStyle, inputClassName }, ref) => (
+    <View style={style}>
+      {label && <Text className="text-[13px] font-medium text-foreground">{label}</Text>}
+      <TextInput
+        ref={ref}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#94A3B8"
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        className={cn(
+          'rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground',
+          error && 'border-destructive',
+          inputClassName,
+        )}
+        style={inputStyle}
+      />
+      {error ? (
+        <Text className="text-[11px] text-destructive">{error}</Text>
+      ) : hint ? (
+        <Text className="text-[11px] text-muted-foreground">{hint}</Text>
+      ) : null}
+    </View>
+  ),
 );
+Input.displayName = 'Input';

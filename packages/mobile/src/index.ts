@@ -1,3 +1,5 @@
+import './lib/nativewind-env';
+
 export * from './theme';
 export * from './components/Button';
 export * from './components/Card';
@@ -12,3 +14,6 @@ export * from './components/Stack';
 export * from './components/Alert';
 export * from './components/Modal';
 export * from './components/Logo';
+export { cn } from './lib/utils';
+export { airwastePreset } from './tailwind-preset';
+export { default as airwastePresetDefault } from './tailwind-preset';

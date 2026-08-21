@@ -1,20 +1,39 @@
 import React from 'react';
-import { Image, Text, View, ViewStyle, TextStyle, ImageStyle } from 'react-native';
-import { theme } from '../theme';
+import { Image, Text, View } from 'react-native';
+import { cva } from 'class-variance-authority';
+import { cn } from '../lib/utils';
+
+const avatarVariants = cva('items-center justify-center rounded-full bg-primary/10 overflow-hidden', {
+  variants: {
+    size: {
+      sm: 'h-8 w-8',
+      md: 'h-10 w-10',
+      lg: 'h-14 w-14',
+    },
+  },
+  defaultVariants: { size: 'md' },
+});
+
+const avatarTextVariants = cva('font-semibold text-primary', {
+  variants: {
+    size: {
+      sm: 'text-xs',
+      md: 'text-sm',
+      lg: 'text-base',
+    },
+  },
+  defaultVariants: { size: 'md' },
+});
 
 export interface AvatarProps {
   src?: string;
   name?: string;
   size?: 'sm' | 'md' | 'lg';
-  style?: ViewStyle;
-  textStyle?: TextStyle;
+  style?: object;
+  textStyle?: object;
+  className?: string;
+  textClassName?: string;
 }
-
-const sizes = {
-  sm: 32,
-  md: 40,
-  lg: 56,
-};
 
 function initials(name?: string): string {
   if (!name) return '?';
@@ -27,26 +46,22 @@ function initials(name?: string): string {
     .toUpperCase();
 }
 
-export const Avatar: React.FC<AvatarProps> = ({ src, name, size = 'md', style, textStyle }) => {
-  const dim = sizes[size];
+export const Avatar: React.FC<AvatarProps> = ({ src, name, size = 'md', style, textStyle, className, textClassName }) => {
   if (src) {
-    return <Image source={{ uri: src }} style={[{ width: dim, height: dim, borderRadius: dim / 2 }, style as ImageStyle]} />;
+    return (
+      <Image
+        source={{ uri: src }}
+        className={cn(avatarVariants({ size }), className)}
+        style={[{ width: undefined, height: undefined }, style]}
+        resizeMode="cover"
+      />
+    );
   }
   return (
-    <View
-      style={[
-        {
-          width: dim,
-          height: dim,
-          borderRadius: dim / 2,
-          backgroundColor: `${theme.colors.brand.primary}1A`,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        style,
-      ]}
-    >
-      <Text style={[{ color: theme.colors.brand.primary, fontWeight: '600' }, textStyle]}>{initials(name)}</Text>
+    <View className={cn(avatarVariants({ size }), className)} style={style}>
+      <Text className={cn(avatarTextVariants({ size }), textClassName)} style={textStyle}>
+        {initials(name)}
+      </Text>
     </View>
   );
 };

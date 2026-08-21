@@ -1,42 +1,37 @@
 import React from 'react';
-import { Modal as RNModal, Pressable, Text, View, ViewStyle, TextStyle } from 'react-native';
-import { theme } from '../theme';
+import { Modal as RNModal, Pressable, Text, View } from 'react-native';
+import { cn } from '../lib/utils';
 
 export interface ModalProps {
   open: boolean;
   onClose: () => void;
   title?: string;
   footer?: React.ReactNode;
-  style?: ViewStyle;
-  titleStyle?: TextStyle;
+  style?: object;
+  titleStyle?: object;
+  className?: string;
+  titleClassName?: string;
   children: React.ReactNode;
 }
 
-export const Modal: React.FC<ModalProps> = ({ open, onClose, title, footer, style, titleStyle, children }) => (
+export const Modal: React.FC<ModalProps> = ({ open, onClose, title, footer, style, titleStyle, className, titleClassName, children }) => (
   <RNModal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-    <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', padding: 16 }} onPress={onClose}>
+    <Pressable
+      className="flex-1 bg-black/40 px-4 justify-center"
+      onPress={onClose}
+    >
       <Pressable
-        style={[
-          {
-            backgroundColor: theme.colors.brand.white,
-            borderRadius: theme.radii.lg,
-            padding: 16,
-            shadowColor: '#000',
-            shadowOpacity: 0.18,
-            shadowRadius: 30,
-            elevation: 10,
-          },
-          style,
-        ]}
+        className={cn('rounded-lg bg-card p-4', className)}
+        style={[{ shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 30, elevation: 10 }, style]}
         onPress={(e) => e.stopPropagation()}
       >
         {title && (
-          <Text style={[{ fontSize: 16, fontWeight: '600', color: theme.colors.neutral[900], marginBottom: 12 }, titleStyle]}>
+          <Text className={cn('mb-3 text-base font-semibold text-foreground', titleClassName)} style={titleStyle}>
             {title}
           </Text>
         )}
         <View>{children}</View>
-        {footer && <View style={{ marginTop: 16 }}>{footer}</View>}
+        {footer && <View className="mt-4">{footer}</View>}
       </Pressable>
     </Pressable>
   </RNModal>

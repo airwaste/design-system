@@ -1,28 +1,18 @@
 import React from 'react';
-import { View, ViewStyle } from 'react-native';
-import { theme } from '../theme';
+import { View } from 'react-native';
+import { cn } from '../lib/utils';
 
 export interface CardProps {
-  padding?: keyof typeof theme.spacing;
-  style?: ViewStyle;
+  padding?: number;
+  style?: object;
+  className?: string;
   children: React.ReactNode;
 }
 
-export const Card: React.FC<CardProps> = ({ padding = 4, style, children }) => (
+export const Card: React.FC<CardProps> = ({ padding = 16, style, className, children }) => (
   <View
-    style={[
-      {
-        backgroundColor: theme.colors.brand.white,
-        borderRadius: theme.radii.lg,
-        padding: theme.spacing[padding],
-        shadowColor: '#000',
-        shadowOpacity: 0.08,
-        shadowRadius: 3,
-        shadowOffset: { width: 0, height: 1 },
-        elevation: 2,
-      },
-      style,
-    ]}
+    className={cn('rounded-lg border border-border bg-card shadow-sm', className)}
+    style={[padding !== 16 ? { padding } : undefined, style]}
   >
     {children}
   </View>

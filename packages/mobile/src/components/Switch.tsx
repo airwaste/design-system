@@ -1,22 +1,26 @@
 import React from 'react';
-import { Switch as RNSwitch, Text, View, ViewStyle } from 'react-native';
-import { theme } from '../theme';
+import { Switch as RNSwitch, Text, View } from 'react-native';
+import { cn } from '../lib/utils';
 
 export interface SwitchProps {
   label?: string;
   value: boolean;
   onValueChange: (value: boolean) => void;
-  style?: ViewStyle;
+  disabled?: boolean;
+  style?: object;
+  className?: string;
+  textClassName?: string;
 }
 
-export const Switch: React.FC<SwitchProps> = ({ label, value, onValueChange, style }) => (
-  <View style={[{ flexDirection: 'row', alignItems: 'center', gap: 8 }, style]}>
+export const Switch: React.FC<SwitchProps> = ({ label, value, onValueChange, disabled, style, className, textClassName }) => (
+  <View className={cn('flex-row items-center gap-2', className)} style={style}>
     <RNSwitch
       value={value}
       onValueChange={onValueChange}
-      trackColor={{ true: theme.colors.brand.primary, false: theme.colors.neutral[300] }}
-      thumbColor={theme.colors.brand.white}
+      disabled={disabled}
+      trackColor={{ true: '#15803D', false: '#CBD5E1' }}
+      thumbColor="#FFFFFF"
     />
-    {label && <Text style={{ fontSize: 14, color: theme.colors.neutral[700] }}>{label}</Text>}
+    {label && <Text className={cn('text-sm text-foreground', textClassName)}>{label}</Text>}
   </View>
 );

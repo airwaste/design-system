@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, ViewStyle } from 'react-native';
+import { View } from 'react-native';
+import { cn } from '../lib/utils';
 import { spacing } from '../tokens';
 
 export interface StackProps {
@@ -7,7 +8,8 @@ export interface StackProps {
   gap?: keyof typeof spacing;
   align?: 'start' | 'center' | 'end' | 'stretch';
   justify?: 'start' | 'center' | 'end' | 'between';
-  style?: ViewStyle;
+  style?: object;
+  className?: string;
   children: React.ReactNode;
 }
 
@@ -31,12 +33,13 @@ export const Stack: React.FC<StackProps> = ({
   align = 'stretch',
   justify = 'start',
   style,
+  className,
   children,
 }) => (
   <View
+    className={cn('flex', direction === 'row' ? 'flex-row' : 'flex-col', className)}
     style={[
       {
-        flexDirection: direction,
         gap: spacing[gap],
         alignItems: alignMap[align],
         justifyContent: justifyMap[justify],

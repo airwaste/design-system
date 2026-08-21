@@ -1,43 +1,67 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, Text, ViewStyle, TextStyle } from 'react-native';
-import { theme } from '../theme';
+import { ActivityIndicator, Pressable, Text } from 'react-native';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../lib/utils';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+const buttonVariants = cva(
+  'flex-row items-center justify-center gap-2 rounded-md active:opacity-85 disabled:opacity-50',
+  {
+    variants: {
+      variant: {
+        primary: 'bg-primary',
+        secondary: 'bg-secondary',
+        ghost: 'bg-transparent',
+        danger: 'bg-destructive',
+      },
+      size: {
+        sm: 'h-9 px-3',
+        md: 'h-10 px-4',
+        lg: 'h-11 px-5',
+      },
+    },
+    defaultVariants: {
+      variant: 'primary',
+      size: 'md',
+    },
+  },
+);
+
+const buttonTextVariants = cva('font-semibold', {
+  variants: {
+    variant: {
+      primary: 'text-primary-foreground',
+      secondary: 'text-secondary-foreground',
+      ghost: 'text-primary',
+      danger: 'text-destructive-foreground',
+    },
+    size: {
+      sm: 'text-[13px]',
+      md: 'text-sm',
+      lg: 'text-base',
+    },
+  },
+  defaultVariants: {
+    variant: 'primary',
+    size: 'md',
+  },
+});
+
+export interface ButtonProps extends VariantProps<typeof buttonVariants> {
   loading?: boolean;
   fullWidth?: boolean;
   disabled?: boolean;
   onPress?: () => void;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
+  style?: object;
+  textStyle?: object;
+  className?: string;
+  textClassName?: string;
   children: React.ReactNode;
 }
 
-const variantBg: Record<ButtonVariant, string> = {
-  primary: theme.colors.brand.primary,
-  secondary: theme.colors.brand.light,
-  ghost: 'transparent',
-  danger: theme.colors.status.error,
-};
-
-const variantText: Record<ButtonVariant, string> = {
-  primary: theme.colors.brand.white,
-  secondary: theme.colors.brand.dark,
-  ghost: theme.colors.brand.primary,
-  danger: theme.colors.brand.white,
-};
-
-const sizePad: Record<ButtonSize, { py: number; px: number; fontSize: number }> = {
-  sm: { py: 6, px: 12, fontSize: 13 },
-  md: { py: 10, px: 16, fontSize: 14 },
-  lg: { py: 14, px: 20, fontSize: 16 },
-};
-
-export const Button: React.FC<ButtonProps> = ({
+export const Button: React.FC<ButtonProps> & { variants: typeof buttonVariants } = ({
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -46,33 +70,32 @@ export const Button: React.FC<ButtonProps> = ({
   onPress,
   style,
   textStyle,
+  className,
+  textClassName,
   children,
-}) => {
-  const s = sizePad[size];
-  return (
-    <Pressable
-      disabled={disabled || loading}
-      onPress={onPress}
-      style={({ pressed }) => [
-        {
-          backgroundColor: variantBg[variant],
-          paddingVertical: s.py,
-          paddingHorizontal: s.px,
-          borderRadius: theme.radii.md,
-          opacity: disabled || loading ? 0.5 : pressed ? 0.85 : 1,
-          alignSelf: fullWidth ? 'stretch' : 'flex-start',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'row',
-          gap: 8,
-        },
-        style,
-      ]}
-    >
-      {loading && <ActivityIndicator size="small" color={variantText[variant]} />}
-      <Text style={[{ color: variantText[variant], fontWeight: '600', fontSize: s.fontSize }, textStyle]}>
-        {children}
-      </Text>
-    </Pressable>
-  );
+}) => (
+  <Pressable
+    role="button"
+    disabled={disabled || loading}
+    onPress={onPress}
+    className={cn(buttonVariants({ variant, size }), fullWidth && 'self-stretch w-full', className)}
+    style={style}
+  >
+    {loading && <ActivityIndicator size="small" color={loadingColor[variant ?? 'primary']} />}
+    <Text className={cn(buttonTextVariants({ variant, size }), textClassName)} style={textStyle}>
+      {children}
+    </Text>
+  </Pressable>
+);
+Button.displayName = 'Button';
+Button.variants = buttonVariants;
+
+// ActivityIndicator needs a concrete color; CSS variables are not readable here.
+const loadingColor: Record<ButtonVariant, string> = {
+  primary: '#FFFFFF',
+  secondary: '#166534',
+  ghost: '#15803D',
+  danger: '#FFFFFF',
 };
+
+export { buttonVariants, buttonTextVariants };

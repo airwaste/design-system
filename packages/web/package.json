@@ -1,19 +1,20 @@
 {
   "name": "@airwaste/design-system-web",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "AirWaste web design system — Tailwind preset + React components for the admin dashboard.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./tailwind-preset": "./dist/tailwind-preset.js"
+    "./tailwind-preset": "./dist/tailwind-preset.js",
+    "./theme.css": "./dist/theme.css"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json && cp src/styles/theme.css dist/theme.css"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
