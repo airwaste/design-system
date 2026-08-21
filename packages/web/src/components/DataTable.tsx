@@ -1,13 +1,25 @@
 import React, { useMemo, useState } from 'react';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  flexRender,
+  type ColumnDef,
+} from '@tanstack/react-table';
+
+type ColumnFiltersState = Array<{ id: string; value: unknown }>;
+type SortingState = Array<{ id: string; desc: boolean }>;
+type VisibilityState = Record<string, boolean>;
+import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 export interface DataTableColumn<T> {
   key: keyof T | string;
   header: string;
-  // optional custom cell renderer
   render?: (row: T) => React.ReactNode;
-  // enable a value-based filter dropdown for this column
   filterable?: boolean;
-  // accessor used for search + filter (defaults to row[key])
   accessor?: (row: T) => string | number;
 }
 
@@ -15,9 +27,7 @@ export interface DataTableProps<T> {
   columns: DataTableColumn<T>[];
   data: T[];
   pageSize?: number;
-  // global search placeholder
   searchPlaceholder?: string;
-  // show the global search box
   searchable?: boolean;
   emptyMessage?: string;
   className?: string;
@@ -36,110 +46,155 @@ export function DataTable<T extends Record<string, any>>({
   searchPlaceholder = 'Search...',
   searchable = true,
   emptyMessage = 'No results found.',
-  className = '',
+  className,
 }: DataTableProps<T>) {
-  const [query, setQuery] = useState('');
-  const [filters, setFilters] = useState<Record<string, string>>({});
-  const [page, setPage] = useState(0);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const filterableCols = columns.filter((c) => c.filterable);
 
-  // distinct values per filterable column
+  // Distinct values per filterable column
   const filterOptions = useMemo(() => {
     const map: Record<string, string[]> = {};
     for (const col of filterableCols) {
-      const vals = Array.from(
-        new Set(data.map((r) => String(getCell(r, col)))),
-      ).sort();
+      const vals = Array.from(new Set(data.map((r) => String(getCell(r, col))))).sort();
       map[col.key as string] = vals;
     }
     return map;
   }, [data, filterableCols]);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return data.filter((row) => {
-      if (q) {
-        const hit = columns.some((c) =>
-          String(getCell(row, c)).toLowerCase().includes(q),
-        );
-        if (!hit) return false;
-      }
-      for (const col of filterableCols) {
-        const fv = filters[col.key as string];
-        if (fv && String(getCell(row, col)) !== fv) return false;
-      }
-      return true;
-    });
-  }, [data, query, filters, columns, filterableCols]);
+  // Convert DataTableColumn[] to TanStack ColumnDef[]
+  const tanstackColumns = useMemo<ColumnDef<T, any>[]>(
+    () =>
+      columns.map((col) => ({
+        id: col.key as string,
+        accessorFn: (row: T) => getCell(row, col),
+        header: col.header,
+        cell: ({ row }: { row: { original: T } }) => (col.render ? col.render(row.original) : String(getCell(row.original, col))),
+        enableSorting: true,
+        enableColumnFilter: col.filterable ?? false,
+      })),
+    [columns],
+  );
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const safePage = Math.min(page, pageCount - 1);
-  const start = safePage * pageSize;
-  const rows = filtered.slice(start, start + pageSize);
+  const table = useReactTable({
+    data,
+    columns: tanstackColumns,
+    state: {
+      globalFilter,
+      columnFilters,
+      sorting,
+      columnVisibility,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    onColumnFiltersChange: setColumnFilters,
+    onSortingChange: setSorting,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize,
+        pageIndex: 0,
+      },
+    },
+  });
 
-  const setFilter = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    setPage(0);
+  const handleFilterChange = (columnId: string, value: string) => {
+    table.getColumn(columnId)?.setFilterValue(value || undefined);
   };
 
+  const currentPage = table.getState().pagination.pageIndex;
+  const totalPages = table.getPageCount();
+  const filteredRows = table.getFilteredRowModel().rows;
+  const pageRows = table.getRowModel().rows;
+  const start = currentPage * pageSize;
+
   return (
-    <div className={['w-full', className].join(' ')}>
+    <div className={cn('w-full', className)}>
       {(searchable || filterableCols.length > 0) && (
         <div className="mb-3 flex flex-wrap items-center gap-2">
           {searchable && (
             <input
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setPage(0);
-              }}
+              value={globalFilter ?? ''}
+              onChange={(e) => setGlobalFilter(e.target.value)}
               placeholder={searchPlaceholder}
-              className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+              className="rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
           )}
-          {filterableCols.map((col) => (
-            <select
-              key={col.key as string}
-              value={filters[col.key as string] ?? ''}
-              onChange={(e) => setFilter(col.key as string, e.target.value)}
-              className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
-            >
-              <option value="">{col.header}: All</option>
-              {filterOptions[col.key as string].map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
-          ))}
+          {filterableCols.map((col) => {
+            const columnId = col.key as string;
+            const currentValue = (table.getColumn(columnId)?.getFilterValue() as string) ?? '';
+            return (
+              <select
+                key={columnId}
+                value={currentValue}
+                onChange={(e) => handleFilterChange(columnId, e.target.value)}
+                className="rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="">{col.header}: All</option>
+                {filterOptions[columnId].map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            );
+          })}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white shadow-card">
+      <div className="overflow-x-auto rounded-lg border bg-card shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-neutral-50 text-neutral-600">
-            <tr>
-              {columns.map((col) => (
-                <th key={col.key as string} className="px-4 py-3 font-semibold">
-                  {col.header}
-                </th>
-              ))}
-            </tr>
+          <thead className="bg-muted text-muted-foreground">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id} className="px-4 py-3 font-semibold">
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className={cn(
+                          'flex items-center gap-2',
+                          header.column.getCanSort() && 'cursor-pointer select-none',
+                        )}
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {header.column.getCanSort() && (
+                          <span className="text-muted-foreground">
+                            {header.column.getIsSorted() === 'asc' ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : header.column.getIsSorted() === 'desc' ? (
+                              <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronsUpDown className="h-4 w-4 opacity-50" />
+                            )}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
           </thead>
-          <tbody className="divide-y divide-neutral-100">
-            {rows.length === 0 ? (
+          <tbody className="divide-y divide-border">
+            {pageRows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-8 text-center text-neutral-400">
+                <td colSpan={columns.length} className="px-4 py-8 text-center text-muted-foreground">
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
-              rows.map((row, i) => (
-                <tr key={i} className="hover:bg-neutral-50">
-                  {columns.map((col) => (
-                    <td key={col.key as string} className="px-4 py-3 text-neutral-800">
-                      {col.render ? col.render(row) : String(getCell(row, col))}
+              pageRows.map((row) => (
+                <tr key={row.id} className="hover:bg-muted/50">
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="px-4 py-3 text-foreground">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
                 </tr>
@@ -149,27 +204,27 @@ export function DataTable<T extends Record<string, any>>({
         </table>
       </div>
 
-      <div className="mt-3 flex items-center justify-between text-sm text-neutral-500">
+      <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
         <span>
-          {filtered.length === 0
+          {filteredRows.length === 0
             ? '0 results'
-            : `Showing ${start + 1}–${Math.min(start + pageSize, filtered.length)} of ${filtered.length}`}
+            : `Showing ${start + 1}–${Math.min(start + pageSize, filteredRows.length)} of ${filteredRows.length}`}
         </span>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={safePage === 0}
-            className="rounded-md border border-neutral-300 px-3 py-1.5 font-medium text-neutral-700 disabled:opacity-40 hover:bg-neutral-50"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className="rounded-md border border-input bg-background px-3 py-1.5 font-medium text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
           >
             Prev
           </button>
           <span>
-            Page {safePage + 1} / {pageCount}
+            Page {currentPage + 1} / {totalPages}
           </span>
           <button
-            onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
-            disabled={safePage >= pageCount - 1}
-            className="rounded-md border border-neutral-300 px-3 py-1.5 font-medium text-neutral-700 disabled:opacity-40 hover:bg-neutral-50"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="rounded-md border border-input bg-background px-3 py-1.5 font-medium text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
           >
             Next
           </button>

@@ -1,24 +1,36 @@
 import React from 'react';
+import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import { Circle } from 'lucide-react';
+import { cn } from '../lib/utils';
 
-export interface RadioProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface RadioProps extends React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> {
   label?: string;
 }
 
-export const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
-  ({ label, className = '', id, ...rest }, ref) => {
-    const inputId = id ?? rest.name;
-    return (
-      <label htmlFor={inputId} className="inline-flex items-center gap-2 cursor-pointer text-sm text-neutral-700">
-        <input
-          ref={ref}
-          id={inputId}
-          type="radio"
-          className={['h-4 w-4 border-neutral-300 text-brand-primary focus:ring-brand-primary/40', className].join(' ')}
-          {...rest}
-        />
-        {label && <span>{label}</span>}
-      </label>
-    );
-  },
-);
+export const Radio = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Item>,
+  RadioProps
+>(({ label, className, id, ...rest }, ref) => {
+  const inputId = id ?? rest.value;
+  return (
+    <label htmlFor={inputId} className="inline-flex items-center gap-2 cursor-pointer text-sm text-foreground">
+      <RadioGroupPrimitive.Item
+        ref={ref}
+        id={inputId}
+        className={cn(
+          'aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'disabled:cursor-not-allowed disabled:opacity-50',
+          className,
+        )}
+        {...rest}
+      >
+        <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
+          <Circle className="h-2.5 w-2.5 fill-current text-current" />
+        </RadioGroupPrimitive.Indicator>
+      </RadioGroupPrimitive.Item>
+      {label && <span>{label}</span>}
+    </label>
+  );
+});
 Radio.displayName = 'Radio';

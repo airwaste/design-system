@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../lib/utils';
 
 export interface AvatarProps {
   src?: string;
@@ -24,23 +25,23 @@ function initials(name?: string): string {
     .toUpperCase();
 }
 
-export const Avatar: React.FC<AvatarProps> = ({ src, name, size = 'md', className = '' }) => {
+export const Avatar: React.FC<AvatarProps> = ({ src, name, size = 'md', className }) => {
   if (src) {
     return (
       <img
         src={src}
         alt={name ?? 'avatar'}
-        className={['rounded-full object-cover bg-neutral-100', sizes[size], className].join(' ')}
+        className={cn('rounded-full object-cover bg-muted', sizes[size], className)}
       />
     );
   }
   return (
     <span
-      className={[
-        'inline-flex items-center justify-center rounded-full bg-brand-primary/10 font-semibold text-brand-primary',
+      className={cn(
+        'inline-flex items-center justify-center rounded-full bg-primary/10 font-semibold text-primary',
         sizes[size],
         className,
-      ].join(' ')}
+      )}
     >
       {initials(name)}
     </span>

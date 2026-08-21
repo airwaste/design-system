@@ -1,5 +1,7 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 export interface ModalProps {
   open: boolean;
@@ -10,28 +12,33 @@ export interface ModalProps {
   className?: string;
 }
 
-export const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, footer, className = '' }) => {
-  if (!open || typeof document === 'undefined') return null;
-  return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden />
-      <div
-        role="dialog"
-        aria-modal="true"
-        className={['relative z-10 w-full max-w-md rounded-lg bg-white shadow-floating', className].join(' ')}
-      >
-        {title && (
-          <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3">
-            <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
-            <button onClick={onClose} aria-label="Close" className="text-neutral-400 hover:text-neutral-700">
-              ✕
-            </button>
-          </div>
-        )}
-        <div className="px-4 py-4 text-sm text-neutral-700">{children}</div>
-        {footer && <div className="border-t border-neutral-200 px-4 py-3">{footer}</div>}
-      </div>
-    </div>,
-    document.body,
+export const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, footer, className }) => {
+  return (
+    <DialogPrimitive.Root open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <DialogPrimitive.Content
+          className={cn(
+            'fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg border bg-background shadow-lg duration-200',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
+            className,
+          )}
+        >
+          {title && (
+            <div className="flex items-center justify-between border-b px-4 py-3">
+              <DialogPrimitive.Title className="text-base font-semibold text-foreground">
+                {title}
+              </DialogPrimitive.Title>
+              <DialogPrimitive.Close className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </DialogPrimitive.Close>
+            </div>
+          )}
+          <div className="px-4 py-4 text-sm text-foreground">{children}</div>
+          {footer && <div className="border-t px-4 py-3">{footer}</div>}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 };

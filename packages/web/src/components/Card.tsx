@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../lib/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   padding?: 'sm' | 'md' | 'lg';
@@ -11,10 +12,10 @@ const paddings = {
 };
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ padding = 'md', className = '', children, ...rest }, ref) => (
+  ({ padding = 'md', className, children, ...rest }, ref) => (
     <div
       ref={ref}
-      className={['rounded-lg bg-white shadow-card border border-neutral-200', paddings[padding], className].join(' ')}
+      className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', paddings[padding], className)}
       {...rest}
     >
       {children}

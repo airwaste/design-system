@@ -1,26 +1,40 @@
 import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../lib/utils';
 import { toneForStatus, type Tone } from '../tone';
 
-export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
+const alertVariants = cva(
+  'rounded-md border px-4 py-3 text-sm transition-colors',
+  {
+    variants: {
+      tone: {
+        success: 'bg-success/15 text-success border-success/30',
+        warning: 'bg-warning/15 text-warning border-warning/30',
+        error: 'bg-destructive/15 text-destructive border-destructive/30',
+        info: 'bg-info/15 text-info border-info/30',
+        neutral: 'bg-muted text-muted-foreground border-border',
+      },
+    },
+    defaultVariants: {
+      tone: 'info',
+    },
+  },
+);
+
+export interface AlertProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof alertVariants> {
   tone?: Tone;
   status?: string;
   title?: string;
 }
 
-const toneClasses: Record<Tone, string> = {
-  success: 'bg-status-success/10 text-status-success border-status-success/30',
-  warning: 'bg-status-warning/10 text-status-warning border-status-warning/30',
-  error: 'bg-status-error/10 text-status-error border-status-error/30',
-  info: 'bg-status-info/10 text-status-info border-status-info/30',
-  neutral: 'bg-neutral-100 text-neutral-700 border-neutral-200',
-};
-
-export const Alert: React.FC<AlertProps> = ({ tone, status, title, className = '', children, ...rest }) => {
+export const Alert: React.FC<AlertProps> = ({ tone, status, title, className, children, ...rest }) => {
   const resolved: Tone = tone ?? (status ? toneForStatus(status) : 'info');
   return (
     <div
       role="alert"
-      className={['rounded-md border px-4 py-3 text-sm', toneClasses[resolved], className].join(' ')}
+      className={cn(alertVariants({ tone: resolved }), className)}
       {...rest}
     >
       {title && <p className="font-semibold">{title}</p>}
@@ -28,3 +42,5 @@ export const Alert: React.FC<AlertProps> = ({ tone, status, title, className = '
     </div>
   );
 };
+
+export { alertVariants };

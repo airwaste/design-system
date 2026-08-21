@@ -1,5 +1,6 @@
 import React from 'react';
 import { spacing } from '../spacing';
+import { cn } from '../lib/utils';
 
 export interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
   direction?: 'row' | 'column';
@@ -27,18 +28,18 @@ export const Stack: React.FC<StackProps> = ({
   gap = 4,
   align = 'stretch',
   justify = 'start',
-  className = '',
+  className,
   style,
   children,
   ...rest
 }) => (
   <div
-    className={[
+    className={cn(
       direction === 'row' ? 'flex flex-row' : 'flex flex-col',
       alignMap[align],
       justifyMap[justify],
       className,
-    ].join(' ')}
+    )}
     style={{ gap: `${spacing[gap]}px`, ...style }}
     {...rest}
   >

@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../lib/utils';
 
 export type SpinnerSize = 'sm' | 'md' | 'lg';
 
@@ -13,14 +14,14 @@ const sizes: Record<SpinnerSize, string> = {
   lg: 'h-8 w-8 border-[3px]',
 };
 
-export const Spinner: React.FC<SpinnerProps> = ({ size = 'md', className = '' }) => (
+export const Spinner: React.FC<SpinnerProps> = ({ size = 'md', className }) => (
   <span
     role="status"
     aria-label="loading"
-    className={[
-      'inline-block animate-spin rounded-full border-current border-t-transparent text-brand-primary',
+    className={cn(
+      'inline-block animate-spin rounded-full border-current border-t-transparent text-primary',
       sizes[size],
       className,
-    ].join(' ')}
+    )}
   />
 );

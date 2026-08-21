@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../lib/utils';
 
 export interface LogoProps {
   variant?: 'full' | 'icon';
@@ -9,11 +10,11 @@ export interface LogoProps {
 
 // Inlined AirWaste brand SVG (canonical copy in assets/airwaste-logo.svg).
 // `full` renders the wordmark + icon; `icon` renders the bin/recycle mark only.
-export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, className = '', title = 'AirWaste' }) => {
+export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, className, title = 'AirWaste' }) => {
   if (variant === 'icon') {
     return (
       <svg
-        className={className}
+        className={cn(className)}
         height={height}
         width={height}
         viewBox="0 0 512 512"
@@ -50,7 +51,7 @@ export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, class
 
   return (
     <svg
-      className={className}
+      className={cn(className)}
       height={height}
       viewBox="0 0 640 200"
       role="img"
