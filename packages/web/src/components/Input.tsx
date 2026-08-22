@@ -6,10 +6,11 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   error?: string;
   hint?: string;
   leadingIcon?: React.ReactNode;
+  trailingSlot?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, hint, leadingIcon, className, id, ...rest }, ref) => {
+  ({ label, error, hint, leadingIcon, trailingSlot, className, id, ...rest }, ref) => {
     const inputId = id ?? rest.name;
     return (
       <div className="flex flex-col gap-1.5">
@@ -33,11 +34,17 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               'disabled:cursor-not-allowed disabled:opacity-50',
               leadingIcon ? 'pl-9 pr-3' : 'px-3',
+              trailingSlot && 'pr-11',
               error && 'border-destructive focus-visible:ring-destructive',
               className,
             )}
             {...rest}
           />
+          {trailingSlot && (
+            <span className="absolute right-1.5 top-1/2 flex h-7 w-8 -translate-y-1/2 items-center justify-center text-muted-foreground">
+              {trailingSlot}
+            </span>
+          )}
         </div>
         {error ? (
           <span className="text-xs text-destructive">{error}</span>
