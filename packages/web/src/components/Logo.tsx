@@ -6,11 +6,14 @@ export interface LogoProps {
   height?: number;
   className?: string;
   title?: string;
+  /** `color` = default brand greens (light backgrounds); `light` = reversed
+   *  wordmark for dark backgrounds (sidebar, footers over photography). */
+  tone?: 'color' | 'light';
 }
 
 // Inlined AirWaste brand SVG (canonical copy in assets/airwaste-logo.svg).
 // `full` renders the wordmark + icon; `icon` renders the bin/recycle mark only.
-export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, className, title = 'AirWaste' }) => {
+export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, className, title = 'AirWaste', tone = 'color' }) => {
   if (variant === 'icon') {
     return (
       <svg
@@ -84,10 +87,10 @@ export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, class
         </g>
       </g>
       <text x="184" y="132" fontFamily="Inter, 'Segoe UI', Arial, sans-serif" fontWeight="800" fontSize="88" letterSpacing="-2">
-        <tspan fill="#15803D">Air</tspan>
-        <tspan fill="#22C55E">Waste</tspan>
+        <tspan fill={tone === 'light' ? '#FFFFFF' : '#15803D'}>Air</tspan>
+        <tspan fill={tone === 'light' ? '#4ADE80' : '#22C55E'}>Waste</tspan>
       </text>
-      <text x="186" y="160" fontFamily="Inter, 'Segoe UI', Arial, sans-serif" fontWeight="700" fontSize="19" letterSpacing="7" fill="#166534">
+      <text x="186" y="160" fontFamily="Inter, 'Segoe UI', Arial, sans-serif" fontWeight="700" fontSize="19" letterSpacing="7" fill={tone === 'light' ? '#86EFAC' : '#166534'}>
         GO GREEN
       </text>
     </svg>
