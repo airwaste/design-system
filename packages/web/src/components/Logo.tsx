@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { cn } from '../lib/utils';
 
 export interface LogoProps {
@@ -14,6 +14,13 @@ export interface LogoProps {
 // Inlined AirWaste brand SVG (canonical copy in assets/airwaste-logo.svg).
 // `full` renders the wordmark + icon; `icon` renders the bin/recycle mark only.
 export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, className, title = 'AirWaste', tone = 'color' }) => {
+  // Unique per-instance gradient ids — duplicated ids across two rendered
+  // Logos (e.g. hidden desktop sidebar + mobile drawer) make url(#…) resolve
+  // to a display:none element and the mark falls back to black.
+  const uid = useId();
+  const iconGradId = `awIconBody-${uid}`;
+  const logoGradId = `awLogoBody-${uid}`;
+
   if (variant === 'icon') {
     return (
       <svg
@@ -26,7 +33,7 @@ export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, class
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <linearGradient id="awIconBody" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={iconGradId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#4ADE80" />
             <stop offset="45%" stopColor="#22C55E" />
             <stop offset="100%" stopColor="#15803D" />
@@ -36,7 +43,7 @@ export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, class
         <rect x="232" y="84" width="48" height="16" rx="8" fill="#4ADE80" />
         <rect x="146" y="100" width="220" height="34" rx="16" fill="#15803D" />
         <path
-          fill="url(#awIconBody)"
+          fill={`url(#${iconGradId})`}
           d="M 160 158 L 178 400 Q 181 418 199 418 L 313 418 Q 331 418 334 400 L 352 158 Q 352 146 340 146 L 172 146 Q 160 146 160 158 Z"
         />
         <rect x="174" y="168" width="16" height="226" rx="8" fill="#FFFFFF" opacity="0.22" />
@@ -62,7 +69,7 @@ export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, class
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id="awLogoBody" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={logoGradId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#4ADE80" />
           <stop offset="45%" stopColor="#22C55E" />
           <stop offset="100%" stopColor="#15803D" />
@@ -73,7 +80,7 @@ export const Logo: React.FC<LogoProps> = ({ variant = 'full', height = 40, class
         <rect x="232" y="84" width="48" height="16" rx="8" fill="#4ADE80" />
         <rect x="146" y="100" width="220" height="34" rx="16" fill="#15803D" />
         <path
-          fill="url(#awLogoBody)"
+          fill={`url(#${logoGradId})`}
           d="M 160 158 L 178 400 Q 181 418 199 418 L 313 418 Q 331 418 334 400 L 352 158 Q 352 146 340 146 L 172 146 Q 160 146 160 158 Z"
         />
         <rect x="174" y="168" width="16" height="226" rx="8" fill="#FFFFFF" opacity="0.22" />
